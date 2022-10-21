@@ -115,9 +115,9 @@ void img_callback(const sensor_msgs::ImageConstPtr &img_msg) {
 
     // log
     ofstream logFile;
-    ROS_INFO_STREAM("Creating " << CONFIG_FILE + "vins_frontend.txt");
-    logFile.open(CONFIG_FILE + "vins_frontend.txt", ios::out);
-    logFile << "FRAME " << frameId << endl;
+    ROS_INFO_STREAM("Creating " << OUTPUT_FOLDER + "vins_frontend.txt");
+    logFile.open(OUTPUT_FOLDER + "vins_frontend.txt", ios::out);
+    logFile << "FRAME " << pub_count << endl;
 
     vector<set<int>> hash_ids(NUM_OF_CAM);
     for (int i = 0; i < NUM_OF_CAM; i++) {
@@ -204,13 +204,16 @@ void img_callback(const sensor_msgs::ImageConstPtr &img_msg) {
 
 void createLogFile() {
   ofstream logFile;
-  ROS_INFO_STREAM("Creating " << CONFIG_FILE + "vins_frontend.txt");
-  logFile.open(CONFIG_FILE + "vins_frontend.txt", ios::out);
+  ROS_INFO_STREAM("Creating " << OUTPUT_FOLDER + "vins_frontend.txt");
+  logFile.open(OUTPUT_FOLDER + "vins_frontend.txt", ios::out);
   logFile << "FORMAT 0" << endl;
-  logFile << "CAMERA " << trackerData->m_camera->getParameters().fx() << " "
-          << trackerData->m_camera->getParameters().fy() << " "
-          << trackerData->m_camera->getParameters().cx() << " "
-          << trackerData->m_camera->getParameters().cy() << endl;
+  if (auto camera = dynamic_pointer_cast<camodocal::PinholeCamera>(
+          trackerData->m_camera)) {
+    logFile << "CAMERA " << camera->getParameters().fx() << " "
+            << camera->getParameters().fy() << " "
+            << camera->getParameters().cx() << " "
+            << camera->getParameters().cy() << endl;
+  }
   logFile << endl;
   logFile.close();
 }
